@@ -17,7 +17,7 @@ module.exports = {
     },
   },
   output: {
-    publicPath: 'http://192.168.2.153:3002/',
+    publicPath: 'http://localhost:3002/',
     clean: true,
   },
   resolve: {
@@ -46,7 +46,7 @@ module.exports = {
       name: 'sale',
       filename: 'remoteEntry.js',
       remotes: {
-        base: 'base@http://192.168.2.153:3000/remoteEntry.js',
+        base: 'base@http://localhost:3000/remoteEntry.js',
       },
       exposes: {
         './CampaignList': './src/components/CampaignList',
