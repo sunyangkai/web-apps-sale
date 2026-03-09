@@ -7,6 +7,9 @@ const path = require('path');
 const ENV = process.env.NODE_ENV || 'development';
 const envPath = path.resolve(__dirname, `.env.${ENV}`);
 
+// 加载环境变量
+require('dotenv').config({ path: envPath });
+
 module.exports = {
   entry: './src/index.js',
   mode: ENV === 'production' ? 'production' : 'development',
