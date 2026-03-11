@@ -5,9 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "webpack serve --mode development",
+    "dev:h5": "webpack serve --config webpack.standalone.js --mode development",
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "clean": "rimraf dist",
+    "build:h5": "webpack --config webpack.standalone.js --mode production",
+    "clean": "rimraf dist dist-standalone",
     "lint": "echo \"Linting sale...\"",
     "test": "echo \"Testing sale...\""
   },

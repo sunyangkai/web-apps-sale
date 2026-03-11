@@ -1,6 +1,4 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { ModuleFederationPlugin } = require('webpack').container;
-const Dotenv = require('dotenv-webpack');
 const path = require('path');
 
 // 环境配置
@@ -11,21 +9,24 @@ const envPath = path.resolve(__dirname, `.env.${ENV}`);
 require('dotenv').config({ path: envPath });
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/standalone/campaign/index.js',
   mode: ENV === 'production' ? 'production' : 'development',
   devServer: {
     static: {
-      directory: path.join(__dirname, 'dist'),
+      directory: path.join(__dirname, 'dist-standalone'),
     },
     host: '0.0.0.0',
-    port: 3002,
+    port: 3003,
     hot: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
   },
   output: {
-    publicPath: process.env.PUBLIC_PATH || 'http://localhost:3002/',
+    path: path.resolve(__dirname, 'dist-standalone/campaign'),
+    publicPath: ENV === 'production'
+      ? 'https://h5.example.com/campaign/'
+      : 'http://localhost:3003/',
     clean: true,
   },
   resolve: {
@@ -50,35 +51,27 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv({
-      path: envPath,
-      safe: false,
-      systemvars: true,
-    }),
-    new ModuleFederationPlugin({
-      name: 'sale',
-      filename: 'remoteEntry.js',
-      remotes: {
-        base: process.env.REMOTE_BASE_URL || 'base@http://localhost:3000/remoteEntry.js',
-      },
-      exposes: {
-        './App': './src/App',
-        './CampaignList': './src/components/CampaignList',
-        './CampaignDetail': './src/components/CampaignDetail',
-      },
-      shared: {
-        react: {
-          singleton: true,
-          requiredVersion: '^16.14.0',
-        },
-        'react-dom': {
-          singleton: true,
-          requiredVersion: '^16.14.0',
-        },
-      },
-    }),
     new HtmlWebpackPlugin({
-      template: './public/index.html',
+      template: './public/standalone.html',
     }),
   ],
+  // 独立页面优化：代码分割
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          priority: 10,
+        },
+        common: {
+          name: 'common',
+          minChunks: 2,
+          priority: 5,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
 };
